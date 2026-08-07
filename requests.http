@@ -1,0 +1,45 @@
+### Get tasks
+GET http://localhost:8080/tasks
+Accept: application/json
+
+
+### Create task
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{
+  "title": "Prepare for Confiz interview"
+}
+
+
+### Get tasks again
+GET http://localhost:8080/tasks
+Accept: application/json
+
+
+### PUT task (Learn Spring Boot properly)
+PUT http://localhost:8080/tasks/3
+Content-Type: application/json
+
+{
+  "title": "Learn Spring Boot properly",
+  "completed": true
+}
+
+
+### PUT task (Nothing)
+PUT http://localhost:8080/tasks/999
+Content-Type: application/json
+
+{
+  "title": "Nothing",
+  "completed": true
+}
+
+
+### Get task #3
+GET http://localhost:8080/tasks/3
+Accept: application/json
+
+### Delete task #3
+DELETE http://localhost:8080/tasks/3
