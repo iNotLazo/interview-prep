@@ -30,7 +30,7 @@ public class TaskController {
     public ResponseEntity<Task> get(@PathVariable Long id) {
         Optional<Task> task = service.getById(id);
 
-        if (!task.isEmpty()){
+        if (task.isEmpty()){
             return ResponseEntity.notFound().build();
         }
 

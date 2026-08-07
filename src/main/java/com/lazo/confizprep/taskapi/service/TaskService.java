@@ -3,59 +3,42 @@ package com.lazo.confizprep.taskapi.service;
 import com.lazo.confizprep.taskapi.dto.CreateTaskRequest;
 import com.lazo.confizprep.taskapi.dto.UpdateTaskRequest;
 import com.lazo.confizprep.taskapi.model.Task;
+import com.lazo.confizprep.taskapi.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class TaskService {
 
-    private final List<Task> tasks = new ArrayList<>();
+    private final TaskRepository repository;
 
-    public TaskService() {
-        tasks.add(
-                new Task(
-                        "Learn Big O",
-                        true
-                )
-        );
-
-        tasks.add(
-                new Task(
-                        "Learn Streams",
-                        true
-                )
-        );
-
-        tasks.add(
-                new Task(
-                        "Learn Spring Boot",
-                        false
-                )
-        );
+    public TaskService(TaskRepository repository) {
+        this.repository = repository;
     }
 
     public List<Task> findAll() {
-        return List.copyOf(tasks);
+        return repository.findAll();
     }
 
     public Task create(CreateTaskRequest request) {
+
         Task task = new Task(
                 request.title(),
                 false
         );
 
-        tasks.add(task);
-
-        return task;
+        return repository.save(task);
     }
 
-    public Optional<Task> update(long id, UpdateTaskRequest request) {
+    public Optional<Task> getById(Long id) {
+        return repository.findById(id);
+    }
 
-        Optional<Task> taskOptional = getById(id);
+    public Optional<Task> update(Long id, UpdateTaskRequest request) {
+
+        Optional<Task> taskOptional = repository.findById(id);
 
         if (taskOptional.isEmpty()) {
             return Optional.empty();
@@ -63,37 +46,22 @@ public class TaskService {
 
         Task task = taskOptional.get();
 
-        Task updatedTask = new Task(
-                task.getTitle(),
-                request.completed()
-        );
+        task.setTitle(request.title());
+        task.setCompleted(request.completed());
 
-        int index = tasks.indexOf(task);
-
-        tasks.set(index, updatedTask);
+        Task updatedTask = repository.save(task);
 
         return Optional.of(updatedTask);
     }
 
     public boolean delete(Long id) {
-        Optional<Task> task = getById(id);
 
-        if (task.isEmpty()) {
+        if (!repository.existsById(id)) {
             return false;
         }
 
-        return tasks.remove(task.get());
-    }
+        repository.deleteById(id);
 
-    public Optional<Task> getByTitle(String title) {
-        return tasks.stream()
-                .filter(task -> task.getTitle().equals(title))
-                .findFirst();
-    }
-
-    public Optional<Task> getById(long id) {
-        return tasks.stream()
-                .filter(task -> task.getId().equals(id))
-                .findFirst();
+        return true;
     }
 }
